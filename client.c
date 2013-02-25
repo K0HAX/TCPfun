@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 		printf("Please enter the message: ");
 		bzero(buffer,256);
 		fgets(buffer,255,stdin);
+		buffer[strlen(buffer) - 1] = '\0';
 		n = write(sockfd, buffer, strlen(buffer));
 		if (n < 0)
 		{
