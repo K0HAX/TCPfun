@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc -pthread server.c helper.c -o server
+gcc -pthread server.c -o server

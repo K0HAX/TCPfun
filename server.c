@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
-#include "helper.h"
 
 #define PORT    "3000" /* Port to listen on */
 #define BACKLOG     10  /* Passed to listen() */
