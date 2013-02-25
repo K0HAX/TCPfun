@@ -26,7 +26,7 @@ void *handle(void *pnewsock)
 	int n;
 	/* send(), recv(), close() */
 	while (1) {
-		bzero(buff,256);
+		memset(buff,NULL,256);
 		n = -1;
 		n = read(sock, buff, 255);
 		if (n < 0)
@@ -35,9 +35,13 @@ void *handle(void *pnewsock)
 			break;
 		}
 
-		if(strcmp(buff, ".exit") == 0)
+		char command[sizeof(buff)];
+		strcpy(command, buff);
+		command[strlen(command) - 1] = '\0';
+
+		if(strcmp(command, ".exit") == 0)
 		{
-			n = write(sock, "I got the message",17);
+			n = write(sock, "Exiting",7);
 			if (n < 0)
 	                {
 	                        perror("Error writing to socket");
@@ -45,7 +49,7 @@ void *handle(void *pnewsock)
 	                }
 			break;
 		}
-
+		printf("Difference from '.exit': %d\n", strcmp(command, ".exit"));
 		printf("Message: %s\n",buff);
 
 		n = write(sock, "I got the message",17);

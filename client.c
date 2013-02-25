@@ -69,6 +69,10 @@ int main(int argc, char *argv[])
 		}
 
 		printf("%s\n",buffer);
+		if(strcmp(buffer, "Exiting") == 0)
+		{
+			break;
+		}
 	}
 
 	return 0;
