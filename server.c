@@ -37,7 +37,7 @@ void *handle(void *pnewsock)
 
 		char command[sizeof(buff)];
 		strcpy(command, buff);
-		command[strlen(command) - 1] = '\0';
+		//command[strlen(command) - 1] = '\0';
 
 		if(strcmp(command, ".exit") == 0)
 		{
