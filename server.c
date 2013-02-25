@@ -49,7 +49,17 @@ void *handle(void *pnewsock)
 	                }
 			break;
 		}
-		printf("Difference from '.exit': %d\n", strcmp(command, ".exit"));
+
+		if(strcmp(command, ".uptime") == 0)
+		{
+			char mUptime[256];
+			mUptime = getuptime();
+			char m_mesg[256];
+			fprintf(m_mesg, "Uptime: %s", mUptime);
+			n = write(sock, m_mesg, sizeof(m_mesg));
+		}
+
+		//printf("Difference from '.exit': %d\n", strcmp(command, ".exit"));
 		printf("Message: %s\n",buff);
 
 		n = write(sock, "I got the message",17);
@@ -137,4 +147,27 @@ int main(void)
     close(sock);
 
     return 0;
+}
+
+char getuptime(void)
+{
+	int link[2];
+	pid_t pid;
+	char buffer[4096];
+
+	if (pipe(link)==-1)
+		die("pipe");
+
+	if ((pid = fork()) == -1)
+		die("fork");
+
+	if(pid == 0) {
+		dup2(link[1], STDOUT_FILENO);
+		close(link[0]);
+		exec("/usr/bin/uptime", "uptime", "-1", (char *)0);
+	} else {
+		close(link[1]);
+		read(link[0], buffer, sizeof(buffer));
+		return buffer;
+	}
 }
