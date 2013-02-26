@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <pthread.h>
+#include "socketData.h"
 
 #define PORT    "3000" /* Port to listen on */
 #define BACKLOG     10  /* Passed to listen() */
@@ -19,6 +20,7 @@
 void *handle(void *pnewsock)
 {
 	int sock = *(int *) pnewsock;
+//	socket_data sData = *(socket_data *) pnewsock;
 
 	free(pnewsock);
 
@@ -29,17 +31,13 @@ void *handle(void *pnewsock)
 		memset(buff,NULL,256);
 		n = -1;
 		n = read(sock, buff, 255);
-		if (n < 0)
+		if (n <= 0)
 		{
 			perror("Error reading from socket");
 			break;
 		}
 
-		char command[sizeof(buff)];
-		strcpy(command, buff);
-		//command[strlen(command) - 1] = '\0';
-
-		if(strcmp(command, ".exit") == 0)
+		if(strcmp(buff, ".exit") == 0)
 		{
 			n = write(sock, "Exiting",7);
 			if (n < 0)
@@ -49,6 +47,11 @@ void *handle(void *pnewsock)
 	                }
 			break;
 		}
+
+		if(strcmp(buff, ".testing") == 0)
+                {
+
+                }
 
 		//printf("Difference from '.exit': %d\n", strcmp(command, ".exit"));
 		printf("Message: %s\n",buff);
@@ -63,6 +66,7 @@ void *handle(void *pnewsock)
 		//Writeline(sock, buff, strlen(buff));
 		//printf("%s\r\n", buff);
 	}
+	close(sock);
 	printf("Released connection\r\n");
 	return NULL;
 }
@@ -109,9 +113,12 @@ int main(void)
         perror("listen");
         return 0;
     }
-
+    int i;
+    i = 0;
     /* Main loop */
     while (1) {
+        i++;
+	printf("Loop: %d\n", i);
 	pthread_t thread;
         size_t size = sizeof(struct sockaddr_in);
         struct sockaddr_in their_addr;
@@ -124,8 +131,15 @@ int main(void)
             printf("Got a connection from %s on port %d\n",
                     inet_ntoa(their_addr.sin_addr), htons(their_addr.sin_port));
 
-	    int *newsock = malloc(sizeof(int));
-	    *newsock = newsock_fd;
+            int *newsock = malloc(sizeof(int));
+            *newsock = newsock_fd;
+
+	    socket_data *sData = SocketDataNew(newsock, inet_ntoa(their_addr.sin_addr),  htons(their_addr.sin_port));
+	    char buf[256];
+	    getSocketDataIP(sData, buf);
+
+//	    printf("Structure IP: %s\nStructure Port: %d\nStructure Socket: %d\n", buf, getSocketDataPort(sData), getSocketDataSocket(sData));
+//	    printf("Normal Socket: %d\n", newsock_fd);
             if (pthread_create(&thread, NULL, handle, newsock) != 0) {
                 fprintf(stderr, "Failed to create thread\n");
             } else {

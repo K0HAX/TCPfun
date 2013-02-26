@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc -pthread server.c -o server
+gcc -pthread socketData.c server.c -o server
